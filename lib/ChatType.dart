@@ -7,6 +7,7 @@ class ChatType extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // button Style 지정
     var buttonStyle = ElevatedButton.styleFrom(
       foregroundColor: Colors.white, // 텍스트 색상, onPrimary: Colors.white 이제 안씀
       backgroundColor: Colors.blue,  // 버튼 색상, primary: Colors.blue 이제 안씀

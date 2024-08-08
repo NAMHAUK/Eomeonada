@@ -4,9 +4,6 @@ import 'package:eomeonada/ChatType.dart';
 void main() {
   runApp(MyApp());
 }
-
-const var a = 1;
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
