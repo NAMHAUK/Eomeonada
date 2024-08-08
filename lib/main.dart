@@ -1,6 +1,5 @@
 import 'package:eomeonada/Home.dart';
 import 'package:flutter/material.dart';
-import 'package:eomeonada/ChatType.dart';
 
 void main() {
   runApp(MyApp());
