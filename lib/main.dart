@@ -1,5 +1,5 @@
+import 'package:eomeonada/Home.dart';
 import 'package:flutter/material.dart';
-import 'package:eomeonada/ChatType.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: ChatType(),
+      home: HomePage(),
     );
   }
 }
