@@ -8,4 +8,3 @@ class Home extends StatelessWidget {
     return const Placeholder();
   }
 }
-print(Text("test 입니다."))
