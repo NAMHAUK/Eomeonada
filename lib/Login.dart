@@ -1,7 +1,6 @@
 import 'package:eomeonada/Home.dart';
 import 'package:eomeonada/main.dart';
 import 'package:flutter/material.dart';
-import 'package:eomeonada/Home.dart';
 
 
 class Login extends StatelessWidget {
@@ -86,7 +85,8 @@ class SecondPage extends StatelessWidget {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        //Navigator.of(context).pop(); 이건 잘못 됐을 때 아닌가
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
                       },
                       child: Text('확인'),
                     ),
@@ -94,12 +94,7 @@ class SecondPage extends StatelessWidget {
                 ),
               );
             } else {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Home(),
-                ),
-              );
+              Navigator.of(context).pop();
             }
           },
           child: Text(
