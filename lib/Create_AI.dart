@@ -10,6 +10,8 @@ class _CreateAiPageState extends State<Create_Ai> {
   Map<String, String> selectedAnswers = {};
   // 사용자 입력값을 저장할 변수
   Map<String, TextEditingController> controllers = {};
+  // 동적으로 생성된 질문들을 저장하는 변수
+  List<String> dynamicQuestions = [];
 
   @override
   void initState() {
@@ -28,6 +30,33 @@ class _CreateAiPageState extends State<Create_Ai> {
     });
     super.dispose();
   }
+  void _saveData() {
+    // 사용자가 입력한 데이터를 저장하는 로직
+    String name = controllers['name']?.text ?? '';
+    String age = controllers['age']?.text ?? '';
+    String mbti = controllers['mbti']?.text ?? '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('완료'),
+          content: Text('나만의 AI 생성이 완료되었습니다!'),
+          actions: [
+            TextButton(
+              child: Text('확인'),
+              onPressed: () {
+                Navigator.pop(context); // 다이얼로그 닫기
+                Navigator.pop(context); // 이전 화면으로 돌아가기
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -81,11 +110,59 @@ class _CreateAiPageState extends State<Create_Ai> {
               '기타',
             ],
           ),
+          // 추가된 질문들을 동적으로 렌더링
+          ...dynamicQuestions.map((dynamicQuestion) {
+            return buildTextField(dynamicQuestion, dynamicQuestion);
+          }).toList(),
+          SizedBox(height: 20.0),
+         OutlinedButton(
+            onPressed: _addQuestion,
+            child: Text('질문 추가'),
+          ),
+          SizedBox(height: 10.0),
+          ElevatedButton(
+            onPressed: _saveData,
+            child: Text('확인'),
+          ),
         ],
       ),
     );
   }
 
+  void _addQuestion() {
+    // 사용자가 질문을 추가할 수 있는 다이얼로그
+    TextEditingController questionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('질문 추가'),
+          content: TextField(
+            controller: questionController,
+            decoration: InputDecoration(hintText: '질문을 입력하세요'),
+          ),
+          actions: [
+            TextButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('추가'),
+              onPressed: () {
+                setState(() {
+                  dynamicQuestions.add(questionController.text);
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
   // TextField를 생성하는 함수
   Widget buildTextField(String question, String key) {
     return Column(
