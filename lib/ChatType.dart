@@ -1,6 +1,7 @@
 import 'package:eomeonada/ChoosingAI_IncludeMe.dart';
 import 'package:eomeonada/ChoosingAI_OnlyAI.dart';
 import 'package:flutter/material.dart';
+import 'ChatingRoom.dart';
 
 class ChatType extends StatelessWidget {
   const ChatType({super.key});
@@ -37,7 +38,7 @@ class ChatType extends StatelessWidget {
             ElevatedButton(
               style: buttonStyle,
               onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ChoosingAI_OnlyAI()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()));
               },
               child: Text("AI 끼리만 채팅")
             )
