@@ -1,7 +1,7 @@
 import 'package:eomeonada/Home.dart';
 import 'package:eomeonada/main.dart';
 import 'package:flutter/material.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -13,7 +13,7 @@ class Login extends StatelessWidget {
         appBar: AppBar(
           title: Text(
             'eomeonada app login',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.blue),
           ),
           backgroundColor: Colors.black,
         ),
@@ -57,10 +57,36 @@ class Login extends StatelessWidget {
 class SecondPage extends StatelessWidget {
   const SecondPage({super.key});
 
+  Future<bool> attemptLogin() async {
+    String userToken = "sampleUserToken"; // 사용자의 토큰, 실제로는 카카오 API 등을 통해 얻어야 함!!
+    String query = "SELECT * FROM users WHERE token = '$userToken'";
+
+    bool isValid = await checkTokenFromDB(query);
+
+    return isValid;
+  }
+
+  Future<bool> checkTokenFromDB(String query) async {
+    // DB에서 쿼리 실행 후, 결과에 따라 true 또는 false 반환!
+    // 여기에 실제 DB 통신 코드가 필요하대
+    bool userExists = false;
+
+    // 예시로 사용자 존재 여부를 가정
+    if (query.contains("sampleUserToken")) {
+      userExists = true;//혹은 false 눌러서 돌아가는지 확인 가능함 ! ㅎ(로그인 성공 여부)
+    }
+
+    return userExists;
+  }
+
+  Future<void> insertNewUser(String userToken) async {
+    // 여기에 실제 데이터베이스에 새로운 사용자를 저장하는 로직을 작성해야 합니다.
+    String insertQuery = "INSERT INTO users (token) VALUES ('$userToken')";
+    // insertQuery 실행하는 로직이 필요합니다.
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool loginSuccess = true; // 이게 영준 선배가 준다는 모시기 값인가...
-
     return Scaffold(
       appBar: AppBar(
         title: Text('로그인 인증 확인'),
@@ -69,14 +95,16 @@ class SecondPage extends StatelessWidget {
         child: ElevatedButton(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(Colors.yellow),
-            shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(1.0)
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(1.0),
+              ),
             ),
           ),
-
-          ),
-          onPressed: () {
+          onPressed: () async {
+            bool loginSuccess = await attemptLogin();
             if (loginSuccess) {
+              // 로그인 성공
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -85,8 +113,12 @@ class SecondPage extends StatelessWidget {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        //Navigator.of(context).pop(); 이건 잘못 됐을 때 아닌가
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(),
+                          ),
+                        );
                       },
                       child: Text('확인'),
                     ),
@@ -94,17 +126,40 @@ class SecondPage extends StatelessWidget {
                 ),
               );
             } else {
-              Navigator.of(context).pop();
+              // 로그인 실패 시, 새로운 사용자 정보를 DB에 저장해야함!
+              String userToken = "sampleUserToken"; // 실제 사용자 토큰으로 교체 필요함 !
+              await insertNewUser(userToken);
+
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('회원가입 완료'),
+                  content: Text('회원가입이 되었습니다!'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(),
+                          ),
+                        );
+                      },
+                      child: Text('확인'),
+                    ),
+                  ],
+                ),
+              );
             }
           },
           child: Text(
             '로그인 인증 확인',
-            style: TextStyle(
-                color: Colors.black
-            ),
+            style: TextStyle(color: Colors.black),
           ),
         ),
       ),
     );
   }
 }
+
+
