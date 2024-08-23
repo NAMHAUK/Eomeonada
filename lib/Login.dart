@@ -1,10 +1,71 @@
 import 'package:eomeonada/Home.dart';
-import 'package:eomeonada/main.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class Login extends StatelessWidget {
-  const Login({super.key});
+class Login extends StatefulWidget {
+  Login({super.key});
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  // 영준)supabase instance 생성
+  final supabase = Supabase.instance.client;
+  bool _isLoading = false;
+
+  Future<void> _signInWithKakao() async {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      // OAuth2 코드로 Supabase에서 로그인 처리
+      final success = await supabase.auth.signInWithOAuth(OAuthProvider.kakao);
+      debugPrint(success ? "success" : "failed");
+      supabase.auth.onAuthStateChange.listen((data) {
+        final AuthChangeEvent event = data.event;
+        if(event == AuthChangeEvent.signedIn) {
+          debugPrint('세션: ${data.session}');
+          _navigateToSecondPage(data);
+        }
+      });
+    } catch (error) {
+      _showErrorDialog('로그인 실패: $error');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _navigateToHomePage() {
+    Navigator.pushReplacement(
+      context, 
+      MaterialPageRoute(
+        builder: (context)=> HomePage(),
+      ),
+    );
+  }
+  void _navigateToSecondPage(data) {
+    Navigator.pushReplacement(
+      context, 
+      MaterialPageRoute(
+        builder: (context)=> SecondPage(session: data.session!),
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text('오류'),
+      content: Text(message),
+      actions: [
+        TextButton(onPressed: ()=> Navigator.pop(context),
+        child: Text('확인'),
+        ),
+      ],
+    ));
+  }  
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +87,7 @@ class Login extends StatelessWidget {
                 Image.asset('assets/logo.png'),
                 Text('Enjoy Us!'),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SecondPage(),
-                      ),
-                    );
-                  },
+                  onPressed: _signInWithKakao,
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(1.0),
@@ -55,7 +109,10 @@ class Login extends StatelessWidget {
 }
 
 class SecondPage extends StatelessWidget {
-  const SecondPage({super.key});
+  final Session session;
+  SecondPage({Key? key, required this.session}) : super(key: key);
+  //supabase 인스턴스 생성
+  final supabase = Supabase.instance.client;
 
   Future<bool> attemptLogin() async {
     String userToken = "sampleUserToken"; // 사용자의 토큰, 실제로는 카카오 API 등을 통해 얻어야 함!!
