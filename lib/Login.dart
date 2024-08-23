@@ -115,7 +115,7 @@ class SecondPage extends StatelessWidget {
   final supabase = Supabase.instance.client;
 
   Future<bool> attemptLogin() async {
-    String userToken = "sampleUserToken"; // 사용자의 토큰, 실제로는 카카오 API 등을 통해 얻어야 함!!
+    String userToken = session.accessToken; // 사용자의 토큰, 실제로는 카카오 API 등을 통해 얻어야 함!!
     String query = "SELECT * FROM users WHERE token = '$userToken'";
 
     bool isValid = await checkTokenFromDB(query);
