@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'Ai_info.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Create_Ai extends StatefulWidget {
   @override
@@ -30,30 +33,62 @@ class _CreateAiPageState extends State<Create_Ai> {
     });
     super.dispose();
   }
-  void _saveData() {
+
+  void _saveData() async {
     // 사용자가 입력한 데이터를 저장하는 로직
     String name = controllers['name']?.text ?? '';
-    String age = controllers['age']?.text ?? '';
+    int age = int.tryParse(controllers['age']?.text ?? '') ?? 0;
     String mbti = controllers['mbti']?.text ?? '';
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('완료'),
-          content: Text('나만의 AI 생성이 완료되었습니다!'),
-          actions: [
-            TextButton(
-              child: Text('확인'),
-              onPressed: () {
-                Navigator.pop(context); // 다이얼로그 닫기
-                Navigator.pop(context); // 이전 화면으로 돌아가기
-              },
-            ),
-          ],
-        );
-      },
-    );
+    List<String> questions = selectedAnswers.entries
+        .map((entry) => '${entry.key}: ${entry.value}')
+        .toList();
+
+    // Supabase 클라이언트 가져오기
+    final supabase = Supabase.instance.client;
+
+    // selectedAnswers에 있는 데이터를 추가
+    AiInfo aiInfo = AiInfo(
+        ai_id: "Default",
+        name: name,
+        age: age,
+        mbti: mbti,
+        questions: questions);
+    String jsonString = jsonEncode(aiInfo.toJson());
+
+    Map<String, dynamic> dataToInsert = {
+      'ai_profile': jsonString
+    };
+
+    // 데이터 삽입
+    final response = await supabase
+        .from('Chatrooms_Info')  // 테이블 이름을 여기에 입력
+        .insert(dataToInsert);
+
+    if (response.error != null) {
+      // 오류가 발생한 경우
+      print('Error inserting data: ${response.error!.message}');
+    } else {
+      // 데이터 삽입 성공
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('완료'),
+            content: Text('나만의 AI 생성이 완료되었습니다!'),
+            actions: [
+              TextButton(
+                child: Text('확인'),
+                onPressed: () {
+                  Navigator.pop(context); // 다이얼로그 닫기
+                  Navigator.pop(context); // 이전 화면으로 돌아가기
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
 
