@@ -21,7 +21,6 @@ class _LoginState extends State<Login> {
     try {
       // OAuth2 코드로 Supabase에서 로그인 처리
       final success = await supabase.auth.signInWithOAuth(OAuthProvider.kakao);
-      debugPrint(success ? "success" : "failed");
       supabase.auth.onAuthStateChange.listen((data) {
         final AuthChangeEvent event = data.event;
         if(event == AuthChangeEvent.signedIn) {
