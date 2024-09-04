@@ -1,4 +1,5 @@
 //import 'package:eomeonada/Home.dart';
+import 'package:eomeonada/Home.dart';
 import 'package:flutter/material.dart';
 import 'Login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,6 +12,7 @@ Future<void> main() async {
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget {
+  final supabase = Supabase.instance.client;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Login(),
+      home: supabase.auth.currentSession!.accessToken.isNotEmpty || !supabase.auth.currentSession!.isExpired ? HomePage() : Login()
     );
   }
 }
