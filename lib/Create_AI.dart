@@ -40,6 +40,9 @@ class _CreateAiPageState extends State<Create_Ai> {
     int age = int.tryParse(controllers['age']?.text ?? '') ?? 0;
     String mbti = controllers['mbti']?.text ?? '';
 
+    if (age < -32768) age = -32768;
+    if (age > 32767) age = 32767;
+
     List<String> questions = selectedAnswers.entries
         .map((entry) => '${entry.key}: ${entry.value}')
         .toList();
@@ -47,28 +50,31 @@ class _CreateAiPageState extends State<Create_Ai> {
     // Supabase 클라이언트 가져오기
     final supabase = Supabase.instance.client;
 
-    // selectedAnswers에 있는 데이터를 추가
-    AiInfo aiInfo = AiInfo(
-        ai_id: "Default",
-        name: name,
-        age: age,
-        mbti: mbti,
-        questions: questions);
-    String jsonString = jsonEncode(aiInfo.toJson());
-
+    String tagsArray = '{${['default', 'example', 'tag'].map((tag) => '"$tag"').join(',')}}';
+    String categoriesArray = '{${[1, 2, 3].join(',')}}';
+    // Supabase에 저장할 기본값 설정
     Map<String, dynamic> dataToInsert = {
-      'ai_profile': jsonString
+      'name': name, // 사용자가 입력한 값
+      'MBTI': mbti, // 사용자가 입력한 값
+      'Age': age, // 사용자가 입력한 값
+      'Question': questions.join(','), // 사용자가 입력한 질문과 답변 리스트
+
+      // 기본값 설정
+      'created_at': DateTime.now().toIso8601String(), // 현재 시간을 저장
+      'imageURL': 'https://default-image-url.com', // 기본 이미지 URL
+      'tag': tagsArray, // 기본 태그
+      'info': 'default info', // 기본 정보
+      'shortinfo': 'default short info', // 짧은 정보
+      'categories': categoriesArray, // 기본 카테고리
+      'universe': 'default universe' // 기본 우주(세계관)
     };
 
     // 데이터 삽입
     final response = await supabase
-        .from('Chatrooms_Info')  // 테이블 이름을 여기에 입력
+        .from('AI_info')  // 테이블 이름을 여기에 입력
         .insert(dataToInsert);
 
-    if (response.error != null) {
-      // 오류가 발생한 경우
-      print('Error inserting data: ${response.error!.message}');
-    } else {
+
       // 데이터 삽입 성공
       showDialog(
         context: context,
@@ -88,7 +94,7 @@ class _CreateAiPageState extends State<Create_Ai> {
           );
         },
       );
-    }
+
   }
 
 
